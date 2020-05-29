@@ -44,7 +44,55 @@ class LumpedComponent(object):
         tl.Itotal[iteration] = tl.current[tl.antpos]
 
 
+    See "The use of SPICE lumped circuits as sub-grid models for FDTD analysis", doi:10.1109/75.289516
+    "Incorporating non-linear lumped elements in FDTD: the equivalent source method"
     """
 
-    def __init__(self):
-        self.ID = None
+
+    '''
+    here's some blather
+
+    The way I've used the sources is as follows:
+
+    ------------------------------------------- - microstrip trace or component lead
+                     !                          - source, Z polarized
+                    | |                         - copper via
+                    | |                         - copper via
+    ------------------------------------------- - copper plane
+    that way the electric field across the source is approximately equal
+    to the voltage across
+
+
+    this is the method used in [antenna paper].
+
+    it would be much more useful to integrate over the field from some specified
+    ground cell to get the relative voltage, especially
+    when we're talking about component leads.
+
+    '''
+
+    i = self.xcoord
+    j = self.ycoord
+    k = self.zcoord
+
+
+    self.voltage
+    self.current
+
+    if self.polarisation == 'x':
+        Ex[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
+
+    elif self.polarisation == 'y':
+        Ey[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
+
+    elif self.polarisation == 'z':
+        Ez[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
+
+
+
+    total_current = (Ix(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
+                    + (Iy(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
+                    + (Iz(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
+    total_current = sqrt(total_current)
+
+    self.current

@@ -116,7 +116,7 @@ class GeometryView(object):
         self.filename = os.path.abspath(os.path.join(G.inputdirectory, self.basefilename + appendmodelnumber))
         self.filename += self.fileext
 
-    def write_vtk(self, G, pbar, material_threshold=0):
+    def write_vtk(self, G, pbar):
         """
         Writes the geometry information to a VTK file. Either ImageData (.vti) for a
         per-cell geometry view, or PolygonalData (.vtp) for a per-cell-edge geometry view.
