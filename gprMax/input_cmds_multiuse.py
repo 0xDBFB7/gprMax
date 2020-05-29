@@ -159,39 +159,50 @@ def process_multicmds(multicmds, G):
 
 
     # Lumped Port
-    # Takes:
     cmdname = '#lumpedport'
     if multicmds[cmdname] is not None:
         for cmdinstance in multicmds[cmdname]:
-            tmp = cmdinstance.split()
-            if len(tmp) < 6:
-                raise CmdInputError("'" + cmdname + ': ' + ' '.join(tmp) + "'" + ' requires at least six parameters')
+            command_args = cmdinstance.split()
+            if(not(len(command_args) == 6)):
+                raise CmdInputError("'" + cmdname + ': ' + ' '.join(command_args) + "'" + ' requires at least six parameters')
+
+            #ARG INDICES#
+            POLARIZATION = 0 #xyz
+            CURRENT_DIRECTION = 1 #+1, -1
+            XCOORD = 2
+            YCOORD = 3
+            ZCOORD = 4
+            SPICE_NET_ID = 5
+            REFERENCE_PORT = 6 # 1 or 0
+
 
             # Check polarity & position parameters
-            polarisation = tmp[0].lower()
+            polarisation = command_args[POLARIZATION].lower()
             if polarisation not in ('x', 'y', 'z'):
-                raise CmdInputError("'" + cmdname + ': ' + ' '.join(tmp) + "'" + ' polarisation must be x, y, or z')
+                raise CmdInputError("'" + cmdname + ': ' + ' '.join(command_args) + "'" + ' polarisation must be x, y, or z')
 
-            xcoord = G.calculate_coord('x', tmp[1])
-            ycoord = G.calculate_coord('y', tmp[2])
-            zcoord = G.calculate_coord('z', tmp[3])
+            xcoord = G.calculate_coord('x', command_args[XCOORD])
+            ycoord = G.calculate_coord('y', command_args[YCOORD])
+            zcoord = G.calculate_coord('z', command_args[ZCOORD])
 
             check_coordinates(xcoord, ycoord, zcoord)
             if xcoord < G.pmlthickness['x0'] or xcoord > G.nx - G.pmlthickness['xmax'] or ycoord < G.pmlthickness['y0'] or ycoord > G.ny - G.pmlthickness['ymax'] or zcoord < G.pmlthickness['z0'] or zcoord > G.nz - G.pmlthickness['zmax']:
-                print(Fore.RED + "WARNING: '" + cmdname + ': ' + ' '.join(tmp) + "'" + ' sources and receivers should not normally be positioned within the PML.' + Style.RESET_ALL)
+                print(Fore.RED + "WARNING: '" + cmdname + ': ' + ' '.join(command_args) + "'" + ' sources and receivers should not normally be positioned within the PML.' + Style.RESET_ALL)
 
             lp = LumpedPort()
             lp.polarisation = polarisation
+            lp.current_direction = int(command_args[1])
             lp.xcoord = xcoord
             lp.ycoord = ycoord
             lp.zcoord = zcoord
-            lp.SPICE_net_ID = int(tmp[1])
-            lp.ID = lp.__class__.__name__ + '(' + str(lp.xcoord) + ',' + str(lp.ycoord) + ',' + str(lp.zcoord) + ')'
+            lp.SPICE_net_ID = int(command_args[1])
+            lp.ID = lp.SPICE_net_ID
 
             if G.messages:
-                print('Voltage source with polarity {} at {:g}m, {:g}m, {:g}m, resistance {:.1f} Ohms,'.format(v.polarisation, v.xcoord * G.dx, v.ycoord * G.dy, v.zcoord * G.dz, v.resistance) + startstop + 'using waveform {} created.'.format(v.waveformID))
+                print('Lumped port with polarity {} at {:g}m, {:g}m, {:g}m'.format(v.polarisation, v.xcoord * G.dx, v.ycoord * G.dy, v.zcoord * G.dz))
 
-            G.voltagesources.append(v)
+            if(int(command_args[REFERENCE_PORT])):
+
 
     #
     # # Spice Netlist

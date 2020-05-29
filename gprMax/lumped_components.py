@@ -39,6 +39,8 @@ class LumpedPort(object):
         self.ycoord = None
         self.zcoord = None
         self.polarisation = None
+        self.current_direction = None
+
         self.conductor_contour_distance_x = None
         self.conductor_contour_distance_y = None
         self.conductor_contour_distance_z = None
@@ -119,10 +121,10 @@ class LumpedComponent(object):
     """
 
     reference_port = None
-    ports = []
+    component_ports = [] # does not include reference_port
 
     def compute_voltages(self):
-        for port in self.ports:
+        for port in self.component_ports:
             port.voltage = e_field_integrate(G, port, self.reference_port)
             port.voltage_history.append(port.voltage)
 
