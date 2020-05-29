@@ -29,13 +29,16 @@ from gprMax.utilities import round_value
 
 
 class LumpedPort(object):
-    self.xcoord = None
-    self.ycoord = None
-    self.zcoord = None
-    self.polarisation = None
-    self.SPICE_net_ID = None
+    def __init__(self):
 
-
+        self.xcoord = None
+        self.ycoord = None
+        self.zcoord = None
+        self.polarisation = None
+        self.SPICE_net_ID = None
+        self.conductor_contour_distance_x = None
+        self.conductor_contour_distance_y = None
+        self.conductor_contour_distance_z = None
 
 
 def e_field_integrate(G, positive_port, reference_port):
@@ -45,14 +48,32 @@ def e_field_integrate(G, positive_port, reference_port):
     Doesn't matter how you integrate.
 
     '''
-    for x in range(positive_port.xcoord,reference_port.xcoord):
-        Ex[i, j, k] * G.dx * 
+    potential_difference = 0
+    if(positive_port.xcoord > reference_port.xcoord):
+        step = -1
+    else:
+        step = 1
+    for x in range(positive_port.xcoord,reference_port.xcoord, step):
+        potential_difference += G.Ex[x, positive_port.ycoord, positive_port.zcoord] * G.dx * step
 
+    if(positive_port.ycoord > reference_port.ycoord):
+        step = -1
+    else:
+        step = 1
+    for y in range(positive_port.ycoord,reference_port.ycoord, step):
+        potential_difference += G.Ey[positive_port.xcoord, y , positive_port.zcoord] * G.dy * step
 
+    if(positive_port.zcoord > reference_port.zcoord):
+        step = -1
+    else:
+        step = 1
+    for z in range(positive_port.zcoord,reference_port.zcoord, step):
+        potential_difference += G.Ez[positive_port.xcoord, positive_port.ycoord, z] * G.dz * step
+
+    return potential_difference
 
 class LumpedComponent(object):
     """
-
 
 
     #waveform: gaussiandot 1 1e9 myWave
@@ -77,38 +98,38 @@ class LumpedComponent(object):
 
     1. Normal electric field update.
     2. Obtain terminal voltages by an electric field line integration from one port to another.
-    3. Normal magnetic field update.  - I think this can happen  at any time, actually.
+    3. Normal magnetic field update.  - I think this can happen at any time, actually.
     4. Obtain the lumped currents from the voltages - either via SPICE or via analytic expressions for each component
-    5.
+    5. Set H along a contour enclosing the conductor to net_current / Lc
 
 
 
     """
 
-
-
-    i = self.xcoord
-    j = self.ycoord
-    k = self.zcoord
-
-
-    self.voltage
-    self.current
-
-    if self.polarisation == 'x':
-        Ex[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
-
-    elif self.polarisation == 'y':
-        Ey[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
-
-    elif self.polarisation == 'z':
-        Ez[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
-
-
-
-    total_current = (Ix(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
-                    + (Iy(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
-                    + (Iz(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
-    total_current = sqrt(total_current)
-
-    self.current
+    #
+    #
+    # i = self.xcoord
+    # j = self.ycoord
+    # k = self.zcoord
+    #
+    #
+    # self.voltage
+    # self.current
+    #
+    # if self.polarisation == 'x':
+    #     Ex[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
+    #
+    # elif self.polarisation == 'y':
+    #     Ey[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
+    #
+    # elif self.polarisation == 'z':
+    #     Ez[i, j, k] -= updatecoeffsE[ID[G.IDlookup[componentID], i, j, k], 4] * self.waveformvaluesJ[iteration] * self.dl * (1 / (G.dx * G.dy * G.dz))
+    #
+    #
+    #
+    # total_current = (Ix(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
+    #                 + (Iy(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
+    #                 + (Iz(i, j, k, G.Hx, G.Hy, G.Hz, G)**2.0)
+    # total_current = sqrt(total_current)
+    #
+    # self.current
