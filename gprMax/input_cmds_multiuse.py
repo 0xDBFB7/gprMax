@@ -163,8 +163,8 @@ def process_multicmds(multicmds, G):
     if multicmds[cmdname] is not None:
         for cmdinstance in multicmds[cmdname]:
             command_args = cmdinstance.split()
-            if(not(len(command_args) == 6)):
-                raise CmdInputError("'" + cmdname + ': ' + ' '.join(command_args) + "'" + ' requires at least six parameters')
+            if(not(len(command_args) == 7)):
+                raise CmdInputError("'" + cmdname + ': ' + ' '.join(command_args) + "'" + ' requires seven parameters')
 
             #ARG INDICES#
             POLARIZATION = 0 #xyz
@@ -202,20 +202,9 @@ def process_multicmds(multicmds, G):
                 print('Lumped port with polarity {} at {:g}m, {:g}m, {:g}m'.format(v.polarisation, v.xcoord * G.dx, v.ycoord * G.dy, v.zcoord * G.dz))
 
             if(int(command_args[REFERENCE_PORT])):
-
-
-    #
-    # # Spice Netlist
-    # cmdname = '#spicenetlist'
-    # if multicmds[cmdname] is not None:
-    #     for cmdinstance in multicmds[cmdname]:
-    #         tmp = cmdinstance.split()
-    #         # See if file exists at specified path and if not try input file directory
-    #         if not os.path.isfile(excitationfile):
-    #             excitationfile = os.path.abspath(os.path.join(G.inputdirectory, excitationfile))
-    #
-    #         if G.messages:
-    #             print('\nSpice netlist file: {}'.format(excitationfile))
+                G.lumped_reference_port = lp
+            else:
+                G.lumped_component_ports.append(lp)
 
 
 

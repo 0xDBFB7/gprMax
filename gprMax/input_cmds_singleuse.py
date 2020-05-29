@@ -260,6 +260,21 @@ def process_singlecmds(singlecmds, G):
         if G.messages:
             print('All receivers will step {:g}m, {:g}m, {:g}m for each model run.'.format(G.rxsteps[0] * G.dx, G.rxsteps[1] * G.dy, G.rxsteps[2] * G.dz))
 
+
+    cmd = '#SPICE_netlist'
+    if singlecmds[cmd] is not None:
+        tmp = singlecmds[cmd].split()
+        if len(tmp) != 1
+            raise CmdInputError(cmd + ' requires one parameter')
+        SPICE_netlist = tmp[0]
+
+        # See if file exists at specified path and if not try input file directory
+        if not os.path.isfile(SPICE_netlist):
+            SPICE_netlist = os.path.abspath(os.path.join(G.inputdirectory, SPICE_netlist))
+
+        if G.messages:
+            print('\nUsing SPICE netlist: {}'.format(SPICE_netlist))
+
     # Excitation file for user-defined source waveforms
     cmd = '#excitation_file'
     if singlecmds[cmd] is not None:

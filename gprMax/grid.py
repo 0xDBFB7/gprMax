@@ -149,8 +149,11 @@ class FDTDGrid(Grid):
         self.hertziandipoles = []
         self.magneticdipoles = []
         self.transmissionlines = []
-        self.lumpedports = []
-        self.lumpedcomponents = []
+
+        self.lumped_reference_port = None
+        self.lumped_component_ports = [] # does not include reference_port
+        self.SPICE_netlist = None
+        
         self.rxs = []
         self.srcsteps = [0, 0, 0]
         self.rxsteps = [0, 0, 0]
