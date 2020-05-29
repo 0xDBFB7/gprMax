@@ -469,6 +469,10 @@ def solve_cpu(currentmodelrun, modelend, G):
         elif Material.maxpoles > 1:
             update_electric_dispersive_multipole_B(G.nx, G.ny, G.nz, G.nthreads, Material.maxpoles, G.updatecoeffsdispersive, G.ID, G.Tx, G.Ty, G.Tz, G.Ex, G.Ey, G.Ez)
 
+        for lc in G.lumped_components:
+            lc.compute_voltages()
+
+
     tsolve = timer() - tsolvestart
 
     return tsolve

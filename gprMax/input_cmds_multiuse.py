@@ -156,6 +156,58 @@ def process_multicmds(multicmds, G):
 
             G.voltagesources.append(v)
 
+
+
+    # Lumped Port
+    # Takes:
+    cmdname = '#lumpedport'
+    if multicmds[cmdname] is not None:
+        for cmdinstance in multicmds[cmdname]:
+            tmp = cmdinstance.split()
+            if len(tmp) < 6:
+                raise CmdInputError("'" + cmdname + ': ' + ' '.join(tmp) + "'" + ' requires at least six parameters')
+
+            # Check polarity & position parameters
+            polarisation = tmp[0].lower()
+            if polarisation not in ('x', 'y', 'z'):
+                raise CmdInputError("'" + cmdname + ': ' + ' '.join(tmp) + "'" + ' polarisation must be x, y, or z')
+
+            xcoord = G.calculate_coord('x', tmp[1])
+            ycoord = G.calculate_coord('y', tmp[2])
+            zcoord = G.calculate_coord('z', tmp[3])
+
+            check_coordinates(xcoord, ycoord, zcoord)
+            if xcoord < G.pmlthickness['x0'] or xcoord > G.nx - G.pmlthickness['xmax'] or ycoord < G.pmlthickness['y0'] or ycoord > G.ny - G.pmlthickness['ymax'] or zcoord < G.pmlthickness['z0'] or zcoord > G.nz - G.pmlthickness['zmax']:
+                print(Fore.RED + "WARNING: '" + cmdname + ': ' + ' '.join(tmp) + "'" + ' sources and receivers should not normally be positioned within the PML.' + Style.RESET_ALL)
+
+            lp = LumpedPort()
+            lp.polarisation = polarisation
+            lp.xcoord = xcoord
+            lp.ycoord = ycoord
+            lp.zcoord = zcoord
+            lp.SPICE_net_ID = int(tmp[1])
+            lp.ID = lp.__class__.__name__ + '(' + str(lp.xcoord) + ',' + str(lp.ycoord) + ',' + str(lp.zcoord) + ')'
+
+            if G.messages:
+                print('Voltage source with polarity {} at {:g}m, {:g}m, {:g}m, resistance {:.1f} Ohms,'.format(v.polarisation, v.xcoord * G.dx, v.ycoord * G.dy, v.zcoord * G.dz, v.resistance) + startstop + 'using waveform {} created.'.format(v.waveformID))
+
+            G.voltagesources.append(v)
+
+    #
+    # # Spice Netlist
+    # cmdname = '#spicenetlist'
+    # if multicmds[cmdname] is not None:
+    #     for cmdinstance in multicmds[cmdname]:
+    #         tmp = cmdinstance.split()
+    #         # See if file exists at specified path and if not try input file directory
+    #         if not os.path.isfile(excitationfile):
+    #             excitationfile = os.path.abspath(os.path.join(G.inputdirectory, excitationfile))
+    #
+    #         if G.messages:
+    #             print('\nSpice netlist file: {}'.format(excitationfile))
+
+
+
     # Hertzian dipole
     cmdname = '#hertzian_dipole'
     if multicmds[cmdname] is not None:

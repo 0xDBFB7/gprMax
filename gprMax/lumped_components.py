@@ -34,14 +34,17 @@ class LumpedPort(object):
     '''
     def __init__(self):
 
+        self.SPICE_net_ID = None
         self.xcoord = None
         self.ycoord = None
         self.zcoord = None
         self.polarisation = None
-        self.SPICE_net_ID = None
         self.conductor_contour_distance_x = None
         self.conductor_contour_distance_y = None
         self.conductor_contour_distance_z = None
+
+        self.voltage = []
+        self.voltage = []
 
         self.voltage_history = []
         self.current_history = []
@@ -114,6 +117,18 @@ class LumpedComponent(object):
 
 
     """
+
+    reference_port = None
+    ports = []
+
+    def compute_voltages(self):
+        for port in self.ports:
+            port.voltage = e_field_integrate(G, port, self.reference_port)
+            port.voltage_history.append(port.voltage)
+
+    # def run_spice(self):
+        # port.current = e_field_integrate(G, port, self.reference_port)
+
 
 
     #
