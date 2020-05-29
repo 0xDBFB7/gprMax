@@ -29,6 +29,9 @@ from gprMax.utilities import round_value
 
 
 class LumpedPort(object):
+    '''
+    Each port can only be part of one Component.
+    '''
     def __init__(self):
 
         self.xcoord = None
@@ -40,6 +43,8 @@ class LumpedPort(object):
         self.conductor_contour_distance_y = None
         self.conductor_contour_distance_z = None
 
+        self.voltage_history = []
+        self.current_history = []
 
 def e_field_integrate(G, positive_port, reference_port):
     '''
@@ -72,6 +77,8 @@ def e_field_integrate(G, positive_port, reference_port):
 
     return potential_difference
 
+
+
 class LumpedComponent(object):
     """
 
@@ -94,17 +101,20 @@ class LumpedComponent(object):
     You can use this 'equivalent source method' either by line-integrating the currents around a conductor
     and setting the electric field, or by line-integrating the voltage and setting the magnetic field.
 
-    I chose the latter because it seems easier to set a voltage initial-condition than a current.
+    I chose the latter because it seems to make more sense to set a voltage initial-condition in SPICE than a current.
 
     1. Normal electric field update.
     2. Obtain terminal voltages by an electric field line integration from one port to another.
     3. Normal magnetic field update.  - I think this can happen at any time, actually.
     4. Obtain the lumped currents from the voltages - either via SPICE or via analytic expressions for each component
     5. Set H along a contour enclosing the conductor to net_current / Lc
+    6. ...
+    7. Profit!
 
 
 
     """
+
 
     #
     #

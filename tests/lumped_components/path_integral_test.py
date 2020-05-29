@@ -9,7 +9,7 @@ from gprMax.utilities import *
 
 from gprMax.input_cmd_funcs import *
 from gprMax.grid import FDTDGrid
-from gprMax.lumped_sources import *
+from gprMax.lumped_components import *
 
 
 def create_test_grid():
@@ -50,6 +50,9 @@ class integral_tests(unittest.TestCase):
         G.Ez.fill(1) #1 v/m
         voltage = e_field_integrate(G, positive_port, reference_port)
         self.assertAlmostEqual(voltage, 1.0, delta=0.05)
+
+# class (unittest.TestCase):
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -47,6 +47,9 @@ def store_outputs(iteration, Ex, Ey, Ez, Hx, Hy, Hz, G):
         tl.Vtotal[iteration] = tl.voltage[tl.antpos]
         tl.Itotal[iteration] = tl.current[tl.antpos]
 
+    for lc in G.lumped_components:
+        
+
 
 kernel_template_store_outputs = Template("""
 
