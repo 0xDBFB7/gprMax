@@ -28,6 +28,27 @@ from gprMax.grid import Iz
 from gprMax.utilities import round_value
 
 
+class LumpedPort(object):
+    self.xcoord = None
+    self.ycoord = None
+    self.zcoord = None
+    self.polarisation = None
+    self.SPICE_net_ID = None
+
+
+
+
+def e_field_integrate(G, positive_port, reference_port):
+    '''
+    Determine the potential difference between two ports.
+
+    Doesn't matter how you integrate.
+
+    '''
+    for x in range(positive_port.xcoord,reference_port.xcoord):
+        Ex[i, j, k] * G.dx * 
+
+
 
 class LumpedComponent(object):
     """
@@ -45,31 +66,26 @@ class LumpedComponent(object):
 
 
     See "The use of SPICE lumped circuits as sub-grid models for FDTD analysis", doi:10.1109/75.289516
+    which deals with lumped elements of a single-cell size, and
     "Incorporating non-linear lumped elements in FDTD: the equivalent source method"
+    which deals with objects of arbitrary size.
+
+    You can use this 'equivalent source method' either by line-integrating the currents around a conductor
+    and setting the electric field, or by line-integrating the voltage and setting the magnetic field.
+
+    I chose the latter because it seems easier to set a voltage initial-condition than a current.
+
+    1. Normal electric field update.
+    2. Obtain terminal voltages by an electric field line integration from one port to another.
+    3. Normal magnetic field update.  - I think this can happen  at any time, actually.
+    4. Obtain the lumped currents from the voltages - either via SPICE or via analytic expressions for each component
+    5.
+
+
+
     """
 
 
-    '''
-    here's some blather
-
-    The way I've used the sources is as follows:
-
-    ------------------------------------------- - microstrip trace or component lead
-                     !                          - source, Z polarized
-                    | |                         - copper via
-                    | |                         - copper via
-    ------------------------------------------- - copper plane
-    that way the electric field across the source is approximately equal
-    to the voltage across
-
-
-    this is the method used in [antenna paper].
-
-    it would be much more useful to integrate over the field from some specified
-    ground cell to get the relative voltage, especially
-    when we're talking about component leads.
-
-    '''
 
     i = self.xcoord
     j = self.ycoord
