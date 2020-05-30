@@ -140,3 +140,13 @@ def write_hdf5_outputfile(outputfile, G):
 
         for output in rx.outputs:
             f['/rxs/rx' + str(rxindex + 1) + '/' + output] = rx.outputs[output]
+
+
+    # Lumped ports
+    for lpindex, lp in enumerate(G.lumped_component_ports):
+        grp = f.create_group('/lps/lp' + str(lp.SPICE_net_ID))
+        grp.attrs['Name'] = lp.SPICE_net_ID
+        grp.attrs['Position'] = (lp.xcoord * G.dx, lp.ycoord * G.dy, lp.zcoord * G.dz)
+
+        f['/lps/lp' + str(lp.SPICE_net_ID) + '/voltages'] = lp.voltage_history
+        f['/lps/lp' + str(lp.SPICE_net_ID) + '/currents'] = lp.current_history

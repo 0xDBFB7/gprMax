@@ -264,7 +264,7 @@ def process_singlecmds(singlecmds, G):
     cmd = '#SPICE_netlist'
     if singlecmds[cmd] is not None:
         tmp = singlecmds[cmd].split()
-        if len(tmp) != 1
+        if(len(tmp) != 1):
             raise CmdInputError(cmd + ' requires one parameter')
         SPICE_netlist = tmp[0]
 
@@ -274,6 +274,8 @@ def process_singlecmds(singlecmds, G):
 
         if G.messages:
             print('\nUsing SPICE netlist: {}'.format(SPICE_netlist))
+
+        G.SPICE_netlist = SPICE_netlist
 
     # Excitation file for user-defined source waveforms
     cmd = '#excitation_file'

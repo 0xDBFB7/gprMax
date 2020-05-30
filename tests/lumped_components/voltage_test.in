@@ -1,0 +1,71 @@
+#num_threads: 14
+
+
+#material: 1     6e7     1 0 copper
+#material: 4.2   0.0  1 0 substrate
+//rel permittivity, conductivity (S/m), rel. permeability, magnetic loss (Ohms/m)
+
+---------------------------------------------------
+#python:
+from gprMax.input_cmd_funcs import *
+import matplotlib.image as mpimage
+import numpy as np
+import os
+import math
+
+time = 2e-9
+print("#time_window: {}".format(time))
+
+
+domain_x = 0.0155
+domain_y = 0.0155
+domain_z = 0.005
+
+N = 100 +20
+#PML boundaries are 10 cells on each side of the domain
+
+domain(domain_x, domain_y, domain_z)
+
+cell_x = domain_x/N
+cell_y = domain_y/N
+cell_z = domain_z/(N/2)
+
+dx_dy_dz(cell_x,cell_y,cell_z)
+
+copper_thickness = 0.000035
+substrate_thickness = 0.00079
+
+#ground plane
+cells_from_border = 12
+box(cells_from_border*cell_x, cells_from_border*cell_y, (cells_from_border*cell_z)-math.ceil(copper_thickness/cell_z)*cell_z,
+                            domain_x-(cells_from_border*cell_x), domain_y-(cells_from_border*cell_y), cells_from_border*cell_z, 'copper')
+
+#substrate
+box(cells_from_border*cell_x, cells_from_border*cell_y, cells_from_border*cell_z,
+                            domain_x-(cells_from_border*cell_x), domain_y-(cells_from_border*cell_y), cells_from_border*cell_z+substrate_thickness, 'substrate')
+
+import_pos_z = cells_from_border*cell_z+substrate_thickness;
+
+print("#voltage_source: z {} {} {} 50 waveform_1".format(tx_pos_x,tx_pos_y,tx_pos_z))
+#polarization, x,y,z, resistance, waveform
+print("#rx: {} {} {}".format(tx_pos_x,tx_pos_y,tx_pos_z))
+box(tx_pos_x,tx_pos_y,import_pos_z-substrate_thickness,tx_pos_x+cell_x,tx_pos_y+cell_y,import_pos_z-(cell_z*2),'copper') #connect bottom face of transmitter to ground plane
+
+rx_pos_x = import_pos_x + 0.0075
+rx_pos_y = import_pos_y + 0.00725
+rx_pos_z = import_pos_z - cell_z
+print("#rx: {} {} {}".format(rx_pos_x,rx_pos_y,rx_pos_z))wav
+box(rx_pos_x,rx_pos_y,import_pos_z-substrate_thickness,rx_pos_x+cell_x,rx_pos_y+cell_y,import_pos_z-(cell_z*2),'copper') #connect bottom face of reciever to ground plane
+
+geometry_view(0,0,0,domain_x,domain_y,domain_z,cell_x,cell_y,cell_z,'geometry') #creates .vti file, no edges
+geometry_view(0,0,0,domain_x,domain_y,domain_z,cell_x,cell_y,cell_z,'geometry',type="f") # creates .vtp file, no sources
+
+
+snapshot_N = 1
+
+for i in range(1, snapshot_N):
+    print('#snapshot: {} {} {} {} {} {} {} {} {} {} snapshot{}'.format(0,0,0,domain_x,domain_y,domain_z,cell_x,cell_y,cell_z,(time/snapshot_N)*i,i))
+
+
+#end_python:
+---------------------------------------------------
